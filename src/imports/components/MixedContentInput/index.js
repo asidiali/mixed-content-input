@@ -11,6 +11,7 @@ export default class MixedContentInput extends React.Component {
     // detect and break up string by params
     const parsedString = str.match(/\{([^}]+)\}/);
     if (params && parsedString) { // if there are any params available to add to the string...
+      // find all param matches in the string and iterate through each one
       const replacedStr = str.replace(/{(.*?)}/g, (match, offset, string) => {
         const sanitizedMatch = match.substring(1, match.length - 1);
         const newStr = `<div contentEditable="false" id="param-button-${sanitizedMatch}" class="param-button" style="background: #f5f5f5; margin: auto 3px; font-size: 0.9em; border: 1px solid #09a3ed; padding: 5px; border-radius: 5px; color: #09a3ed; user-select: none; display: inline-block;">${sanitizedMatch}</div>`;
@@ -18,31 +19,35 @@ export default class MixedContentInput extends React.Component {
         // has to be global because this is created before the
         // state change is rendered, so el isn't in the DOM yet
         window.addEventListener('click', (e) => {
+          // get click target to check class
           const target = e.target;
-          console.log('click target');
-          console.log(target);
           const cname = target.getAttribute('class');
-          if (cname && cname === 'param-button') {
+          if (cname && cname === 'param-button') { // if we clicked on a param button in the input...
+            // pull the value from the button
             const clickedMatch = target.textContent;
             let listHTML = '';
+            // create available options for the popup and inject them into the popup list
             params.forEach((param) => {
               listHTML += `<li id="param-option-${param}" data-for="${clickedMatch}" class="param-option" style="font-weight: ${(param === clickedMatch) ? '700' : '400'}; font-size: 1em; padding: 15px; cursor: pointer; border-bottom: 1px solid #ddd;">${param}</li>`;
             });
             document.getElementById('params-list').innerHTML = listHTML;
             document.getElementById('params-list-wrapper').style.display = 'flex';
             return;
-          } else if (cname && cname === 'param-option') {
+          } else if (cname && cname === 'param-option') { // if we clicked on a param option in the popup...
+            // pull the value from the list option
             const clickedParam = target.textContent;
+            // pull the name of the button the list options pertains to
             const activeMatch = target.getAttribute('data-for');
-
+            // inject the new value directly into the original param button
             document.getElementById(`param-button-${activeMatch}`).textContent = clickedParam;
+            // re-ID the original button to match the new param value
             document.getElementById(`param-button-${activeMatch}`).id = `param-button-${clickedParam}`;
-
+            // close the param options popup
             document.getElementById('params-list-wrapper').style.display = 'none';
             return;
-          } else {
-            return false;
           }
+          // if the click occurs on any el we're not targeting, ignore...
+          return false;
         });
         // return the newly formed string back to the original replace iteration
         return newStr;
