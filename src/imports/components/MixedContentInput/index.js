@@ -2,6 +2,12 @@ import React from 'react';
 
 export default class MixedContentInput extends React.Component {
 
+  state = {
+    showParamOptions: false,
+  };
+
+  hideParamOptions = () => this.setState({ showParamOptions: false });
+
   /*
    * Parse Params
    * This is the main piece of separating out params from the rest of the string.
@@ -15,43 +21,6 @@ export default class MixedContentInput extends React.Component {
       const replacedStr = str.replace(/{(.*?)}/g, (match, offset, string) => {
         const sanitizedMatch = match.substring(1, match.length - 1);
         const newStr = `<div contentEditable="false" id="param-button-${sanitizedMatch}" class="param-button" style="background: #f5f5f5; margin: auto 3px; font-size: 0.9em; border: 1px solid #09a3ed; padding: 5px; border-radius: 5px; color: #09a3ed; user-select: none; display: inline-block;">${sanitizedMatch}</div>`;
-        // create a global event listener for the click
-        // has to be global because this is created before the
-        // state change is rendered, so el isn't in the DOM yet
-        window.addEventListener('click', (e) => {
-          // get click target to check class
-          const target = e.target;
-          console.log(e.currentTarget);
-          console.log(e.target);
-          console.log(e);
-          const cname = target.getAttribute('class');
-          if (cname && cname === 'param-button') { // if we clicked on a param button in the input...
-            // pull the value from the button
-            const clickedMatch = target.textContent;
-            let listHTML = '';
-            // create available options for the popup and inject them into the popup list
-            params.forEach((param) => {
-              listHTML += `<li id="param-option-${param}" data-for="${clickedMatch}" class="param-option" style="font-weight: ${(param === clickedMatch) ? '700' : '400'}; font-size: 1em; padding: 15px; cursor: pointer; border-bottom: 1px solid #ddd;">${param}</li>`;
-            });
-            document.getElementById(`params-list-${this.props.template}-${this.props.section}`).innerHTML = listHTML;
-            document.getElementById(`params-list-wrapper-${this.props.template}-${this.props.section}`).style.display = 'flex';
-            return;
-          } else if (cname && cname === 'param-option') { // if we clicked on a param option in the popup...
-            // pull the value from the list option
-            const clickedParam = target.textContent;
-            // pull the name of the button the list options pertains to
-            const activeMatch = target.getAttribute('data-for');
-            // inject the new value directly into the original param button
-            document.getElementById(`param-button-${activeMatch}`).textContent = clickedParam;
-            // re-ID the original button to match the new param value
-            document.getElementById(`param-button-${activeMatch}`).id = `param-button-${clickedParam}`;
-            // close the param options popup
-            document.getElementById(`params-list-wrapper-${this.props.template}-${this.props.section}`).style.display = 'none';
-            return;
-          }
-          // if the click occurs on any el we're not targeting, ignore...
-          return false;
-        });
         // return the newly formed string back to the original replace iteration
         return newStr;
       });
@@ -94,7 +63,11 @@ export default class MixedContentInput extends React.Component {
 
   onInputClick = (e) => {
     const clickTarget = e.target;
-    console.log(clickTarget.getAttribute('class'))
+    const targetClass = clickTarget.getAttribute('class');
+
+    if (targetClass === 'param-button') {
+      this.setState({ showParamOptions: true });
+    }
   }
 
   render() {
@@ -124,17 +97,29 @@ export default class MixedContentInput extends React.Component {
           *
           *
         */}
-        <div
-          id={`params-list-wrapper-${this.props.template}-${this.props.section}`}
-          onClick={(e) => (e.target.style.display = 'none')}
-          style={styles.paramsListWrapper}
-        >
-          <ul
-            id={`params-list-${this.props.template}-${this.props.section}`}
-            style={styles.paramsList}
+        {this.state.showParamOptions ? (
+          <div
+            id={`params-list-wrapper-${this.props.template}-${this.props.section}`}
+            onClick={this.hideParamOptions}
+            style={styles.paramsListWrapper}
           >
-          </ul>
-        </div>
+            <ul
+              id={`params-list-${this.props.template}-${this.props.section}`}
+              style={styles.paramsList}
+            >
+              {this.props.paramOptions.map((option, index) => (
+                <li
+                  key={`param-option-${index}`}
+                  id={`param-option-${option}`}
+                  className="param-option"
+                  style={styles.paramOption(false)}
+                >
+                  {option}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : false}
       </div>
     );
   }
@@ -161,7 +146,6 @@ const styles = {
     zIndex: 9999,
     height: '100vh',
     width: '100vw',
-    display: 'none',
     flexFlow: 'column nowrap',
     justifyContent: 'center',
   },
@@ -174,4 +158,11 @@ const styles = {
     display: 'flex',
     flexFlow: 'column nowrap',
   },
+  paramOption: active => ({
+    fontWeight: active ? 700 : 400,
+    fontSize: '1.1em',
+    padding: 15,
+    cursor: 'pointer',
+    borderBottom: '1px solid #ddd',
+  }),
 };
