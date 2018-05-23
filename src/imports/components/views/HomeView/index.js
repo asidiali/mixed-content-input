@@ -47,11 +47,21 @@ export default class HomeView extends React.Component {
         <div
           style={styles.inputWrapper}
         >
-          {this.state.template && this.state.template.length ? (
+          {this.state.title && this.state.title.length ? (
             <MixedContentInput
               template={templateName}
               section="title"
-              content={this.state.template}
+              content={this.state.title}
+              paramOptions={templateParams}
+              update={this.update}
+            />
+          ) : false}
+
+          {this.state.description && this.state.description.length ? (
+            <MixedContentInput
+              template={templateName}
+              section="description"
+              content={this.state.description}
               paramOptions={templateParams}
               update={this.update}
             />

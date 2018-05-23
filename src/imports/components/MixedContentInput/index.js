@@ -49,12 +49,14 @@ export default class MixedContentInput extends React.Component {
     let sanStr = val.replace(/(<([^>]+)>)/ig, '');
     sanStr = sanStr.replace(/&nbsp;/g, ' ');
 
+    const section = this.props.section;
+
     let params = this.props.paramOptions;
     if (params && params.length) {
       params.forEach((param, index) => {
         sanStr = sanStr.replace(param, `{${param}}`);
         if (index === params.length - 1) {
-          this.props.update(val)
+          this.props.update(section, val)
             .then(() => console.log('Update successful'));
         }
       });
