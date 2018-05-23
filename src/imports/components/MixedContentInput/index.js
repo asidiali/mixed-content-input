@@ -2,9 +2,15 @@ import React from 'react';
 
 export default class MixedContentInput extends React.Component {
 
+  /*
+   * Parse Params
+   * This is the main piece of separating out params from the rest of the string.
+   * This function needs to be "react"ified...
+   */
   parseParams = (str, params) => {
-    const arr = str.match(/\{([^}]+)\}/);
-    if (params && arr) {
+    // detect and break up string by params
+    const parsedString = str.match(/\{([^}]+)\}/);
+    if (params && parsedString) { // if there are any params available to add to the string...
       const replacedStr = str.replace(/{(.*?)}/g, (match, offset, string) => {
         const sanitizedMatch = match.substring(1, match.length - 1);
         const newStr = `<div contentEditable="false" id="param-button-${sanitizedMatch}" class="param-button" style="background: #f5f5f5; margin: auto 3px; font-size: 0.9em; border: 1px solid #09a3ed; padding: 5px; border-radius: 5px; color: #09a3ed; user-select: none; display: inline-block;">${sanitizedMatch}</div>`;
@@ -38,11 +44,30 @@ export default class MixedContentInput extends React.Component {
             return false;
           }
         });
+        // return the newly formed string back to the original replace iteration
         return newStr;
       });
+      // return the final replaced string after iterating through all string matches
       return replacedStr;
     }
+    // If there aren't any params to add - just return the original string
+    //
+    // If there are params IN the original string, they WILL NOT be parsed as
+    // there are no matching available param options also included.
+    //
+    // This should never be the case as if there is a param in the string,
+    // that param will also be listed as an available param.
     return str;
+  }
+
+  onInputFocus = (e) => {
+    console.log(e.target);
+  }
+
+  onInputBlur = (e) => {
+    const val = e.target.value;
+    this.props.update(val)
+      .then(() => console.log('Update successful'));
   }
 
 
@@ -51,11 +76,26 @@ export default class MixedContentInput extends React.Component {
       <div
         style={styles.container}
       >
+        {/*
+          *
+          * This is the main component input
+          *
+          *
+        */}
         <div
           style={styles.input}
           dangerouslySetInnerHTML={{ __html: this.parseParams(this.props.content, this.props.paramOptions) }}
+          contentEditable
+          onFocus={this.onInputFocus}
+          onBlur={this.onInputBlur}
         >
         </div>
+        {/*
+          *
+          * This is the hidden params popup menu
+          *
+          *
+        */}
         <div
           id="params-list-wrapper"
           onClick={(e) => (e.target.style.display = 'none')}
