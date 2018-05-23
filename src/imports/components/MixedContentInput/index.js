@@ -30,8 +30,8 @@ export default class MixedContentInput extends React.Component {
             params.forEach((param) => {
               listHTML += `<li id="param-option-${param}" data-for="${clickedMatch}" class="param-option" style="font-weight: ${(param === clickedMatch) ? '700' : '400'}; font-size: 1em; padding: 15px; cursor: pointer; border-bottom: 1px solid #ddd;">${param}</li>`;
             });
-            document.getElementById(`params-list-${this.props.template}`).innerHTML = listHTML;
-            document.getElementById(`params-list-wrapper-${this.props.template}`).style.display = 'flex';
+            document.getElementById(`params-list-${this.props.template}-${this.props.section}`).innerHTML = listHTML;
+            document.getElementById(`params-list-wrapper-${this.props.template}-${this.props.section}`).style.display = 'flex';
             return;
           } else if (cname && cname === 'param-option') { // if we clicked on a param option in the popup...
             // pull the value from the list option
@@ -43,7 +43,7 @@ export default class MixedContentInput extends React.Component {
             // re-ID the original button to match the new param value
             document.getElementById(`param-button-${activeMatch}`).id = `param-button-${clickedParam}`;
             // close the param options popup
-            document.getElementById(`params-list-wrapper-${this.props.template}`).style.display = 'none';
+            document.getElementById(`params-list-wrapper-${this.props.template}-${this.props.section}`).style.display = 'none';
             return;
           }
           // if the click occurs on any el we're not targeting, ignore...
@@ -102,12 +102,12 @@ export default class MixedContentInput extends React.Component {
           *
         */}
         <div
-          id={`params-list-wrapper-${this.props.template}`}
+          id={`params-list-wrapper-${this.props.template}-${this.props.section}`}
           onClick={(e) => (e.target.style.display = 'none')}
           style={styles.paramsListWrapper}
         >
           <ul
-            id={`params-list-${this.props.template}`}
+            id={`params-list-${this.props.template}-${this.props.section}`}
             style={styles.paramsList}
           >
           </ul>

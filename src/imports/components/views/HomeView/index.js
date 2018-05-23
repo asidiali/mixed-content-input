@@ -36,6 +36,7 @@ export default class HomeView extends React.Component {
         {this.state.template && this.state.template.length ? (
           <MixedContentInput
             template={templateName}
+            section="title"
             content={this.state.template}
             paramOptions={templateParams}
             update={this.update}
