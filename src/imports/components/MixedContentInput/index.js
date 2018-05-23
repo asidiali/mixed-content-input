@@ -21,6 +21,9 @@ export default class MixedContentInput extends React.Component {
         window.addEventListener('click', (e) => {
           // get click target to check class
           const target = e.target;
+          console.log(e.currentTarget);
+          console.log(e.target);
+          console.log(e);
           const cname = target.getAttribute('class');
           if (cname && cname === 'param-button') { // if we clicked on a param button in the input...
             // pull the value from the button
@@ -66,7 +69,9 @@ export default class MixedContentInput extends React.Component {
   }
 
   onInputFocus = (e) => {
-    console.log(e.target);
+    const template = this.props.template;
+    const section = this.props.section;
+    console.log(`${template}/${section} input focused`);
   }
 
   onInputBlur = (e) => {
@@ -87,6 +92,11 @@ export default class MixedContentInput extends React.Component {
     }
   }
 
+  onInputClick = (e) => {
+    const clickTarget = e.target;
+    console.log(clickTarget.getAttribute('class'))
+  }
+
   render() {
     return (
       <div
@@ -99,11 +109,13 @@ export default class MixedContentInput extends React.Component {
           *
         */}
         <div
+          ref={ref => (this.input = ref)}
           style={styles.input}
           dangerouslySetInnerHTML={{ __html: this.parseParams(this.props.content, this.props.paramOptions) }}
           contentEditable
           onFocus={this.onInputFocus}
           onBlur={this.onInputBlur}
+          onClick={this.onInputClick}
         >
         </div>
         {/*
