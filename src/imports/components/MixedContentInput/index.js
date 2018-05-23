@@ -70,11 +70,22 @@ export default class MixedContentInput extends React.Component {
   }
 
   onInputBlur = (e) => {
-    const val = e.target.value;
-    this.props.update(val)
-      .then(() => console.log('Update successful'));
-  }
+    const el = e.target;
+    const val = el.innerHTML;
+    let sanStr = val.replace(/(<([^>]+)>)/ig, '');
+    sanStr = sanStr.replace(/&nbsp;/g, ' ');
 
+    let params = this.props.paramOptions;
+    if (params && params.length) {
+      params.forEach((param, index) => {
+        sanStr = sanStr.replace(param, `{${param}}`);
+        if (index === params.length - 1) {
+          this.props.update(val)
+            .then(() => console.log('Update successful'));
+        }
+      });
+    }
+  }
 
   render() {
     return (

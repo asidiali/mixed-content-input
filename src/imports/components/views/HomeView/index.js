@@ -24,6 +24,7 @@ export default class HomeView extends React.Component {
   }
 
   update = (string) => new Promise((resolve, reject) => {
+    console.log(string);
     ls.set('demo__data', string);
     this.setState({ template: string }, () => resolve());
   });
