@@ -9,6 +9,8 @@ const templateParams = [
   'adjustedContactFullName',
 ];
 
+const templateName = 'ContactOrderCard';
+
 export default class HomeView extends React.Component {
 
   state = {
@@ -33,6 +35,7 @@ export default class HomeView extends React.Component {
         <hr />
         {this.state.template && this.state.template.length ? (
           <MixedContentInput
+            template={templateName}
             content={this.state.template}
             paramOptions={templateParams}
             update={this.update}
