@@ -66,7 +66,10 @@ export default class MixedContentInput extends React.Component {
     const targetClass = clickTarget.getAttribute('class');
 
     if (targetClass === 'param-button') {
-      this.setState({ showParamOptions: true });
+      this.setState({
+        showParamOptions: true,
+        selectedParam: clickTarget.textContent,
+      });
     }
   }
 
@@ -113,6 +116,7 @@ export default class MixedContentInput extends React.Component {
                   id={`param-option-${option}`}
                   className="param-option"
                   style={styles.paramOption(false)}
+                  onClick={() => this.handleParamOptionClick(option)}
                 >
                   {option}
                 </li>
@@ -128,14 +132,9 @@ export default class MixedContentInput extends React.Component {
 const styles = {
   container: {},
   input: {
-    margin: '40px auto',
-    width: 600,
-    height: 400,
-    background: '#fff',
-    border: '1px solid #eee',
+    margin: 0,
     fontSize: '1.25em',
     lineHeight: 1.75,
-    padding: 40,
   },
   paramsListWrapper: {
     position: 'fixed',

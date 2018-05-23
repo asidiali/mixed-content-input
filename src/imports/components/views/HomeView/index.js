@@ -7,6 +7,9 @@ const templateParams = [
   'adjustedContactFirstName',
   'adjustedContactLastName',
   'adjustedContactFullName',
+  'adjustedDistributorFirstName',
+  'adjustedDistributorLastName',
+  'adjustedDistributorFullName',
 ];
 
 const templateName = 'ContactOrderCard';
@@ -14,18 +17,26 @@ const templateName = 'ContactOrderCard';
 export default class HomeView extends React.Component {
 
   state = {
-    template: '',
+    title: '',
+    description: '',
   };
 
   componentDidMount() {
-    let string = ls.get('demo__data');
-    if (!string) string = '{adjustedContactFullName} just ordered a moment ago!';
-    this.setState({ template: string });
+    let title = ls.get('demo__title');
+    let description = ls.get('demo__description');
+    if (!title) title = 'You have a new order!';
+    if (!description) description = '{adjustedContactFullName} just ordered a moment ago.';
+    this.setState({
+      title,
+      description,
+    });
   }
 
-  update = (string) => new Promise((resolve, reject) => {
-    ls.set('demo__data', string);
-    this.setState({ template: string }, () => resolve());
+  update = (section, string) => new Promise((resolve, reject) => {
+    ls.set(`demo__${section}`, string);
+    const update = {};
+    update[section] = string;
+    this.setState(update, () => resolve());
   });
 
   render() {
@@ -33,15 +44,19 @@ export default class HomeView extends React.Component {
       <div style={styles.base}>
         <h1>Mixed Content Input Component Demo</h1>
         <hr />
-        {this.state.template && this.state.template.length ? (
-          <MixedContentInput
-            template={templateName}
-            section="title"
-            content={this.state.template}
-            paramOptions={templateParams}
-            update={this.update}
-          />
-        ) : false}
+        <div
+          style={styles.inputWrapper}
+        >
+          {this.state.template && this.state.template.length ? (
+            <MixedContentInput
+              template={templateName}
+              section="title"
+              content={this.state.template}
+              paramOptions={templateParams}
+              update={this.update}
+            />
+          ) : false}
+        </div>
       </div>
     );
   }
