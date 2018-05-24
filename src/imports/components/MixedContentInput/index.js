@@ -15,25 +15,31 @@ export default class MixedContentInput extends React.Component {
    */
   parseParams = (str, params) => {
     // detect and break up string by params
-    const parsedString = str.match(/\{([^}]+)\}/);
-    if (params && parsedString) { // if there are any params available to add to the string...
-      // find all param matches in the string and iterate through each one
-      const replacedStr = str.replace(/{(.*?)}/g, (match, offset, string) => {
-        const sanitizedMatch = match.substring(1, match.length - 1);
-        const newStr = `<div contentEditable="false" id="param-button-${sanitizedMatch}" class="param-button" style="background: #f5f5f5; margin: auto 3px; font-size: 0.9em; border: 1px solid #09a3ed; padding: 5px; border-radius: 5px; color: #09a3ed; user-select: none; display: inline-block;">${sanitizedMatch}</div>`;
-        // return the newly formed string back to the original replace iteration
-        return newStr;
+    const splitStr = str.split(/\{([^}]+)\}/);
+
+    if (splitStr && splitStr.length && params) {
+      const el = splitStr.map((part) => {
+        if (part === '') return false;
+        if (params && params.includes(part)) {
+          return (
+            <div
+              key={`param-button-${this.props.section}-${part}`}
+              ref={ref => (this[`param_${part}`] = ref)}
+              contentEditable={false}
+              id={`param-button-${this.props.section}-${part}`}
+              className="param-button"
+              style={styles.paramButton}
+              onClick={() => this.handleParamButtonClick(part)}
+            >
+              {part}
+            </div>
+          )
+        }
+        return part;
       });
-      // return the final replaced string after iterating through all string matches
-      return replacedStr;
+      return el;
     }
-    // If there aren't any params to add - just return the original string
-    //
-    // If there are params IN the original string, they WILL NOT be parsed as
-    // there are no matching available param options also included.
-    //
-    // This should never be the case as if there is a param in the string,
-    // that param will also be listed as an available param.
+
     return str;
   }
 
@@ -56,13 +62,21 @@ export default class MixedContentInput extends React.Component {
       params.forEach((param, index) => {
         sanStr = sanStr.replace(param, `{${param}}`);
         if (index === params.length - 1) {
-          this.props.update(section, val)
+          this.props.update(section, sanStr)
             .then(() => console.log('Update successful'));
         }
       });
     }
   }
 
+  handleParamButtonClick = (param) => {
+    this.setState({
+      showParamOptions: true,
+      selectedParam: param,
+    });
+  }
+
+  /*
   onInputClick = (e) => {
     const clickTarget = e.target;
     const targetClass = clickTarget.getAttribute('class');
@@ -73,6 +87,24 @@ export default class MixedContentInput extends React.Component {
         selectedParam: clickTarget.textContent,
       });
     }
+  }
+  */
+
+  handleParamOptionClick = (option) => {
+    const param = this.state.selectedParam;
+    const ref = this[`param_${param}`];
+
+    const str = this.props.content;
+    const splitStr = str.split(/\{([^}]+)\}/);
+    let updatedStr = '';
+    splitStr.forEach((part) => {
+      if (part === '') return false;
+      if (part === param) return updatedStr += `{${option}}`;
+      return updatedStr += part;
+    });
+
+    this.props.update(this.props.section, updatedStr)
+      .then(() => this.setState({ selectedParam: null, showParamOptions: false }));
   }
 
   render() {
@@ -88,13 +120,13 @@ export default class MixedContentInput extends React.Component {
         */}
         <div
           ref={ref => (this.input = ref)}
-          style={styles.input}
-          dangerouslySetInnerHTML={{ __html: this.parseParams(this.props.content, this.props.paramOptions) }}
+          style={{ ...styles.input, ...this.props.style || {}  }}
           contentEditable
           onFocus={this.onInputFocus}
           onBlur={this.onInputBlur}
           onClick={this.onInputClick}
         >
+          {this.parseParams(this.props.content, this.props.paramOptions)}
         </div>
         {/*
           *
@@ -137,6 +169,17 @@ const styles = {
     margin: 0,
     fontSize: '1.25em',
     lineHeight: 1.75,
+  },
+  paramButton: {
+    background: '#f5f5f5',
+    margin: 'auto 3px',
+    fontSize: '0.9em',
+    border: '1px solid #09a3ed',
+    padding: 5,
+    borderRadius: 5,
+    color: '#09a3ed',
+    userSelect: 'none',
+    display: 'inline-block',
   },
   paramsListWrapper: {
     position: 'fixed',

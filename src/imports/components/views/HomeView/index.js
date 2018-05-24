@@ -54,6 +54,7 @@ export default class HomeView extends React.Component {
               content={this.state.title}
               paramOptions={templateParams}
               update={this.update}
+              style={styles.title}
             />
           ) : false}
 
@@ -64,6 +65,7 @@ export default class HomeView extends React.Component {
               content={this.state.description}
               paramOptions={templateParams}
               update={this.update}
+              style={styles.description}
             />
           ) : false}
         </div>

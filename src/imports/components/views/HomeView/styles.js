@@ -13,5 +13,14 @@ export default {
     margin: '40px auto',
     minHeight: 400,
     width: 500,
-  }
+  },
+  title: {
+    color: '#888',
+    fontSize: '1.1em',
+    marginBottom: 10,
+  },
+  description: {
+    color: '#111',
+    fontSize: '1.25em',
+  },
 };
