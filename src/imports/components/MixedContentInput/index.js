@@ -5,6 +5,7 @@ class MixedContentInput extends React.Component {
 
   state = {
     showParamOptions: false,
+    cursorPosition: null,
   };
 
   hideParamOptions = () => this.setState({ showParamOptions: false });
@@ -47,6 +48,9 @@ class MixedContentInput extends React.Component {
     const template = this.props.template;
     const section = this.props.section;
     console.log(`${template}/${section} input focused`);
+    this.setState({
+      showAddParamButton: true,
+    });
   }
 
   onInputBlur = (e) => {
@@ -54,6 +58,8 @@ class MixedContentInput extends React.Component {
     const val = el.innerHTML;
     let sanStr = val.replace(/(<([^>]+)>)/ig, '');
     sanStr = sanStr.replace(/&nbsp;/g, ' ');
+
+    this.setState({ showAddParamButton: false });
 
     const section = this.props.section;
 
@@ -93,6 +99,10 @@ class MixedContentInput extends React.Component {
       .then(() => this.setState({ selectedParam: null, showParamOptions: false }));
   }
 
+  handleAddParamClick = () => {
+    console.log(this.state.cursorPosition);
+  }
+
   render() {
     return (
       <div
@@ -110,9 +120,22 @@ class MixedContentInput extends React.Component {
           contentEditable
           onFocus={this.onInputFocus}
           onBlur={this.onInputBlur}
+          onClick={(e) => {
+            const selection = window.getSelection();
+            const selectedText = selection.toString();
+            const selectedRange = selection.getRangeAt(0);
+            this.setState({ cursorPosition: selectedRange.startOffset });
+          }}
         >
           {this.parseParams(this.props.content, this.props.paramOptions)}
         </div>
+        {this.state.showAddParamButton ? (
+          <button
+            onMouseDown={this.handleAddParamClick}
+          >
+            + Add Param
+          </button>
+        ) : false}
         {/*
           *
           * This is the hidden params popup menu
@@ -151,7 +174,6 @@ class MixedContentInput extends React.Component {
 const styles = {
   container: {},
   input: {
-    margin: 0,
     fontSize: '1.25em',
     lineHeight: 1.75,
   },
@@ -165,6 +187,7 @@ const styles = {
     color: '#09a3ed',
     userSelect: 'none',
     display: 'inline-block',
+    position: 'relative',
     cursor: 'pointer',
     ':hover': {
       background: '#09a3ed',
