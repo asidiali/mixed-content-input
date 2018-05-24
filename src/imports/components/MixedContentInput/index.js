@@ -11,7 +11,6 @@ export default class MixedContentInput extends React.Component {
   /*
    * Parse Params
    * This is the main piece of separating out params from the rest of the string.
-   * This function needs to be "react"ified...
    */
   parseParams = (str, params) => {
     // detect and break up string by params
@@ -76,20 +75,6 @@ export default class MixedContentInput extends React.Component {
     });
   }
 
-  /*
-  onInputClick = (e) => {
-    const clickTarget = e.target;
-    const targetClass = clickTarget.getAttribute('class');
-
-    if (targetClass === 'param-button') {
-      this.setState({
-        showParamOptions: true,
-        selectedParam: clickTarget.textContent,
-      });
-    }
-  }
-  */
-
   handleParamOptionClick = (option) => {
     const param = this.state.selectedParam;
     const ref = this[`param_${param}`];
@@ -124,7 +109,6 @@ export default class MixedContentInput extends React.Component {
           contentEditable
           onFocus={this.onInputFocus}
           onBlur={this.onInputBlur}
-          onClick={this.onInputClick}
         >
           {this.parseParams(this.props.content, this.props.paramOptions)}
         </div>
