@@ -1,6 +1,7 @@
 import React from 'react';
+import radium from 'radium';
 
-export default class MixedContentInput extends React.Component {
+class MixedContentInput extends React.Component {
 
   state = {
     showParamOptions: false,
@@ -164,6 +165,11 @@ const styles = {
     color: '#09a3ed',
     userSelect: 'none',
     display: 'inline-block',
+    cursor: 'pointer',
+    ':hover': {
+      background: '#09a3ed',
+      color: '#fff',
+    }
   },
   paramsListWrapper: {
     position: 'fixed',
@@ -194,3 +200,5 @@ const styles = {
     borderBottom: '1px solid #ddd',
   }),
 };
+
+export default radium(MixedContentInput);
