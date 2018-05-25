@@ -87,6 +87,15 @@ class MixedContentInput extends React.Component {
     const ref = this[`param_${param}`];
 
     const str = this.props.content;
+
+    if (!param && !ref) {
+      const cursor = this.state.cursorPosition;
+      const updatedStr = str.slice(0, cursor) + `{${option}}` + str.slice(cursor, str.length);
+
+      return this.props.update(this.props.section, updatedStr)
+        .then(() => this.setState({ selectedParam: null, showParamOptions: false }));
+    }
+
     const splitStr = str.split(/\{([^}]+)\}/);
     let updatedStr = '';
     splitStr.forEach((part) => {
@@ -100,7 +109,8 @@ class MixedContentInput extends React.Component {
   }
 
   handleAddParamClick = () => {
-    console.log(this.state.cursorPosition);
+    const cursor = this.state.cursorPosition;
+    this.setState({ showParamOptions: true });
   }
 
   render() {
